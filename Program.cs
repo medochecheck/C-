@@ -1,94 +1,85 @@
-using System;
-using System.Globalization;
+﻿using System;
 
-class Program
+namespace PointDistanceApp
 {
-    static void Main()
+    // Структура Point, представляющая трехмерную точку
+    struct Point
     {
-        double num1, num2;
+        public decimal X { get; }
+        public decimal Y { get; }
+        public decimal Z { get; }
 
-        // Только целые числа
-
-        /*
-        Console.Write("Введите первое число: ");
-        while (!double.TryParse(Console.ReadLine(), out num1))
+        public Point(decimal x, decimal y, decimal z)
         {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите первое число: ");
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
+
+    // Класс Informer
+    class Informer
+    {
+        // Защищенный метод PrintToConsole, доступен только в производных классах
+        protected void PrintToConsole(string data)
+        {
+            Console.WriteLine(data);
+        }
+    }
+
+    // Класс Calculator, наследующий Informer
+    class Calculator : Informer
+    {
+        // Метод для вычисления расстояния между двумя точками
+        public void CalculateDistance(Point p1, Point p2)
+        {
+            decimal distance = (decimal)Math.Sqrt(
+                (double)((p2.X - p1.X) * (p2.X - p1.X) +
+                         (p2.Y - p1.Y) * (p2.Y - p1.Y) +
+                         (p2.Z - p1.Z) * (p2.Z - p1.Z)));
+
+            PrintToConsole($"Расстояние между точками: {distance:F2}");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("Введите координаты для двух точек. Каждое значение вводится через Enter.");
+            Console.WriteLine("Пример: для X, Y, Z точки 1 введите 1.2 (Enter), 3.4 (Enter), 5.6 (Enter).");
+
+            // Ввод координат для первой точки
+            Point point1 = ReadPointFromUser("первой");
+            Point point2 = ReadPointFromUser("второй");
+
+            // Создаем объект Calculator и вычисляем расстояние
+            Calculator calculator = new Calculator();
+            calculator.CalculateDistance(point1, point2);
         }
 
-        // Ввод второго числа с проверкой
-        Console.Write("Введите второе число: ");
-        while (!double.TryParse(Console.ReadLine(), out num2))
+        // Метод для чтения точки от пользователя с проверкой корректности ввода
+        static Point ReadPointFromUser(string pointName)
         {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите второе число: ");
-        }
-        */
+            decimal x = ReadDecimal($"Введите координату X для {pointName} точки:");
+            decimal y = ReadDecimal($"Введите координату Y для {pointName} точки:");
+            decimal z = ReadDecimal($"Введите координату Z для {pointName} точки:");
 
-
-        // С учетом обработки десятичных дробей
-
-        Console.Write("Введите первое число (дробная часть отделяется точкой или запятой): ");
-        while (!TryParseDouble(Console.ReadLine(), out num1))
-        {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите первое число: ");
+            return new Point(x, y, z);
         }
 
-
-        // Ввод второго числа с проверкой
-
-        Console.Write("Введите второе число (дробная часть отделяется точкой или запятой): ");
-        while (!TryParseDouble(Console.ReadLine(), out num2))
+        // Метод для чтения числа с проверкой
+        static decimal ReadDecimal(string prompt)
         {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите второе число: ");
-        }
-
-
-        // Выполнение операций через отдельные функции
-
-        double sum = Add(num1, num2);
-        double difference = Subtract(num1, num2);
-        double product = Multiply(num1, num2);
-        string division = Divide(num1, num2);
-
-
-        // Функция сложения
-
-        double Add(double a, double b) { return a + b; }
-
-        // Функция вычитания
-
-        double Subtract(double a, double b) { return a - b; }
-
-        // Функция умножения
-
-        double Multiply(double a, double b) { return a * b; }
-
-        // Функция деления с проверкой на ноль
-
-        string Divide(double a, double b)
-        { return b != 0 ? (a / b).ToString(CultureInfo.InvariantCulture) : "Ошибка: деление на ноль невозможно"; }
-
-
-        Console.WriteLine("\nРезультаты операций:");
-        Console.WriteLine("Сложение: " + sum.ToString(CultureInfo.InvariantCulture));
-        Console.WriteLine("Вычитание: " + difference.ToString(CultureInfo.InvariantCulture));
-        Console.WriteLine("Умножение: " + product.ToString(CultureInfo.InvariantCulture));
-        Console.WriteLine("Деление: " + division);
-
-
-        // Метод для обработки ввода с учетом разделителя точки и запятой
-
-        bool TryParseDouble(string input, out double result)
-        {
-            if (double.TryParse(input, NumberStyles.Any, CultureInfo.CurrentCulture, out result))
+            decimal value;
+            while (true)
             {
-                return true;
+                Console.WriteLine(prompt);
+                string input = Console.ReadLine();
+                if (decimal.TryParse(input, out value))
+                    return value;
+                Console.WriteLine("Ошибка: введите корректное число!");
             }
-            return double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
         }
     }
 }
