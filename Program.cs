@@ -1,94 +1,119 @@
-using System;
-using System.Globalization;
+﻿using System;
 
+// Интерфейс ICar
+interface ICar
+{
+    int Capacity { get; set; } // Вместимость 
+
+    void Start();              // Запуск автомобиля
+    void Stop();               // Остановка автомобиля
+    void Honk();               // Подать сигнал (гудок)
+    void Refuel(double amount); // Заправить автомобиль
+    string GetStatus();        // Получить текущий статус автомобиля
+}
+
+// Интерфейс Imovement
+interface Imovement
+{
+    void MoveForward();  // Движение вперед
+    void MoveBackward(); // Движение назад
+    void MoveLeft();     // Движение влево
+    void MoveRight();    // Движение вправо
+}
+
+// Абстрактный класс ACar
+abstract class ACar : ICar
+{
+    public int Capacity { get; set; } 
+    public Imovement Movement { get; set; } 
+
+    public abstract void Start();
+    public abstract void Stop();  
+
+    public abstract void Honk(); 
+    public abstract void Refuel(double amount); 
+    public abstract string GetStatus(); 
+}
+
+// Класс ElectricMovement
+class ElectricMovement : Imovement
+{
+    public void MoveForward()
+    {
+        Console.WriteLine("Электромобиль едет вперед.");
+    }
+
+    public void MoveBackward()
+    {
+        Console.WriteLine("Электромобиль едет назад.");
+    }
+
+    public void MoveLeft()
+    {
+        Console.WriteLine("Электромобиль поворачивает налево.");
+    }
+
+    public void MoveRight()
+    {
+        Console.WriteLine("Электромобиль поворачивает направо.");
+    }
+}
+
+// Конкретный класс ElectricCar
+class ElectricCar : ACar
+{
+    private double batteryLevel; // Уровень заряда батареи
+
+    public ElectricCar()
+    {
+        Movement = new ElectricMovement(); // Установка движения типа ElectricMovement
+        batteryLevel = 100; // Полный заряд
+    }
+
+    public override void Start()
+    {
+        Console.WriteLine("Электромобиль запускается.");
+    }
+
+    public override void Stop()
+    {
+        Console.WriteLine("Электромобиль останавливается.");
+    }
+
+    public override void Honk()
+    {
+        Console.WriteLine("Бип-бип! Электромобиль подает сигнал.");
+    }
+
+    public override void Refuel(double amount)
+    {
+        batteryLevel += amount;
+        if (batteryLevel > 100)
+            batteryLevel = 100; // Максимальный заряд 100%
+        Console.WriteLine($"Электромобиль заряжен на {batteryLevel}%.");
+    }
+
+    public override string GetStatus()
+    {
+        return $"Электромобиль включен. Уровень заряда: {batteryLevel}%.";
+    }
+}
+
+// Точка входа в программу
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        double num1, num2;
+        // Создание экземпляра ElectricCar
+        ElectricCar myCar = new ElectricCar();
+        myCar.Capacity = 4; // Задание вместимости
 
-        // Только целые числа
-
-        /*
-        Console.Write("Введите первое число: ");
-        while (!double.TryParse(Console.ReadLine(), out num1))
-        {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите первое число: ");
-        }
-
-        // Ввод второго числа с проверкой
-        Console.Write("Введите второе число: ");
-        while (!double.TryParse(Console.ReadLine(), out num2))
-        {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите второе число: ");
-        }
-        */
-
-
-        // С учетом обработки десятичных дробей
-
-        Console.Write("Введите первое число (дробная часть отделяется точкой или запятой): ");
-        while (!TryParseDouble(Console.ReadLine(), out num1))
-        {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите первое число: ");
-        }
-
-
-        // Ввод второго числа с проверкой
-
-        Console.Write("Введите второе число (дробная часть отделяется точкой или запятой): ");
-        while (!TryParseDouble(Console.ReadLine(), out num2))
-        {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите число.");
-            Console.Write("Введите второе число: ");
-        }
-
-
-        // Выполнение операций через отдельные функции
-
-        double sum = Add(num1, num2);
-        double difference = Subtract(num1, num2);
-        double product = Multiply(num1, num2);
-        string division = Divide(num1, num2);
-
-
-        // Функция сложения
-
-        double Add(double a, double b) { return a + b; }
-
-        // Функция вычитания
-
-        double Subtract(double a, double b) { return a - b; }
-
-        // Функция умножения
-
-        double Multiply(double a, double b) { return a * b; }
-
-        // Функция деления с проверкой на ноль
-
-        string Divide(double a, double b)
-        { return b != 0 ? (a / b).ToString(CultureInfo.InvariantCulture) : "Ошибка: деление на ноль невозможно"; }
-
-
-        Console.WriteLine("\nРезультаты операций:");
-        Console.WriteLine("Сложение: " + sum.ToString(CultureInfo.InvariantCulture));
-        Console.WriteLine("Вычитание: " + difference.ToString(CultureInfo.InvariantCulture));
-        Console.WriteLine("Умножение: " + product.ToString(CultureInfo.InvariantCulture));
-        Console.WriteLine("Деление: " + division);
-
-
-        // Метод для обработки ввода с учетом разделителя точки и запятой
-
-        bool TryParseDouble(string input, out double result)
-        {
-            if (double.TryParse(input, NumberStyles.Any, CultureInfo.CurrentCulture, out result))
-            {
-                return true;
-            }
-            return double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
-        }
+        myCar.Start();      // Запуск машины
+        myCar.Honk();       // Подача сигнала
+        Console.WriteLine(myCar.GetStatus()); // Получение статуса
+        myCar.Refuel(20);   // Зарядка машины
+        Console.WriteLine(myCar.GetStatus()); // Проверка статуса после зарядки
+        myCar.Movement.MoveRight(); // Машина едет направо
+        myCar.Stop();       // Остановка машины
     }
 }
